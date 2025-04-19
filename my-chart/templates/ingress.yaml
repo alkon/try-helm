@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "my-sample-chart.fullname" . }}
+  name: {{ include "my-chart.fullname" . }}
   labels:
-    {{- include "my-sample-chart.labels" . | nindent 4 }}
+    {{- include "my-chart.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "my-sample-chart.fullname" $ }}
+                name: {{ include "my-chart.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}

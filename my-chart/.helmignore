@@ -1,0 +1,46 @@
+# Helm-specific
+.helmignore
+
+# General (including VCS dirs)
+.DS_Store
+node_modules/
+/out
+/bundle
+/tmp
+.git/
+.gitignore
+
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+
+# IDEs-specific
+.project
+.idea/
+*.tmproj
+.vscode/
+
+# Python-specific
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+venv/
+.env
+local_settings.py
+/build
+dist/
+eggs/
+*.egg-info/
+
+# Log files
+*.log
+
+# Dependency Management
+requirements.txt
+Pipfile
+Pipfile.lock
