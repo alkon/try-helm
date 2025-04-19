@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0 # Needed for git tags
 
       - name: Set up Helm
-        uses: actions/setup-helm@v3 # Corrected
+        uses: azure/setup-helm@v4 # Corrected
         with:
           version: "v3.14.0" # Or the version you need
 
