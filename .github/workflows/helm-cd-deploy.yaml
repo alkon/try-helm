@@ -1,0 +1,43 @@
+name: Deploy Helm Chart to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Publish Helm Chart to OCI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Helm Registry Login
+        run: |
+          echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
+          helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
+
+      - name: Pull Helm Chart from OCI
+        run: |
+          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
+          helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
+          ls -l
+
+      - name: Install/Upgrade Helm Release
+        run: |
+          helm upgrade --install my-release ./my-chart-$CHART_VERSION.tgz \
+            --namespace default --create-namespace \
+            --set image.tag=$CHART_VERSION
