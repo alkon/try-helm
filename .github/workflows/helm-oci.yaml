@@ -26,21 +26,21 @@ jobs:
         run: |
           mkdir -p ~/.docker
           echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        registry: docker.io
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Package Helm Chart
-      run: |
-        helm package my-chart/ # Corrected path
+        run: |
+          helm package my-chart/ # Corrected path
 
       - name: Push Helm Chart to OCI
-      run: |
-        # cd charts/my-chart # Removed
-        # set the tag
-        CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') # Corrected path
-        echo "CHART VERSION: $CHART_VERSION"
-        helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v$CHART_VERSION # Corrected path
+        run: |
+          # cd charts/my-chart # Removed
+          # set the tag
+          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') # Corrected path
+          echo "CHART VERSION: $CHART_VERSION"
+          helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v$CHART_
