@@ -20,7 +20,7 @@ jobs:
       - name: Set up Helm
         uses: actions/setup-helm@v3
         with:
-          version: "v3.13.3" # Or the version you need
+          version: "v3.14.0" # Or the version you need
 
       - name: Set up Docker config
         run: |
