@@ -60,6 +60,11 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }} # Add KUBECONFIG as secret in Github
 
+      - name: Show current Kubernetes context
+        run: |
+          kubectl config current-context
+          kubectl get nodes    
+
       - name: Template Helm chart
         run: |
           helm template my-release ./my-chart-${{ env.CHART_VERSION }}.tgz \
@@ -74,3 +79,13 @@ jobs:
           manifests: |
             rendered.yaml
           namespace: default
+          pull-images: true
+          strategy: basic
+          route-method: service
+          version-switch-buffer: 0
+          traffic-split-method: pod
+          percentage: 0
+          force: false
+          annotate-namespace: true
+          private-cluster: false
+          skip-tls-verify: false
