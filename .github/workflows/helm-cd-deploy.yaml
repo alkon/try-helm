@@ -32,10 +32,10 @@ jobs:
           helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
 
       - name: Pull Helm Chart from OCI
-        run: |
-          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
-          helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
-          ls -l
+          run: |
+            CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
+            helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v$CHART_VERSION  --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
+            ls -l
 
       - name: Install/Upgrade Helm Release
         run: |
