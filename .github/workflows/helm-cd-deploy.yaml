@@ -54,6 +54,19 @@ jobs:
 #          mv *.tgz my-chart-${{ env.CHART_VERSION }}.tgz
 #          ls -l # Monitor *.tgz name and version
 
+      - name: Validate KUBE_CONFIG format (debug only)
+        run: |
+          echo "==== Cluster Names ===="
+          yq e '.clusters[].name' <<< "$KUBECONFIG"
+
+          echo "==== Context Names ===="
+          yq e '.contexts[].name' <<< "$KUBECONFIG"
+
+          echo "==== Current Context ===="
+          yq e '.current-context' <<< "$KUBECONFIG"
+        env:
+          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
+
       - name: Set up Kubernetes context
         uses: azure/k8s-set-context@v3
         with:
