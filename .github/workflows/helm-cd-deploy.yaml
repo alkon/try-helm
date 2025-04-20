@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    env:
+      CHART_VERSION: "0.1.1"  # Set it here for the entire job
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,9 +27,9 @@ jobs:
           echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
           helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
 
-      - name: Extract chart version from Chart.yaml # Store it as GITHUB_ENV to reference later with ${{ env.CHART_VERSION }}
-        run: |
-          echo "CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '\"')" >> $GITHUB_ENV
+#      - name: Extract chart version from Chart.yaml # Store it as GITHUB_ENV to reference later with ${{ env.CHART_VERSION }}
+#        run: |
+#          echo "CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '\"')" >> $GITHUB_ENV
 
       - name: Pull Helm Chart from OCI using Helm
         run: |
@@ -53,19 +55,6 @@ jobs:
 #          oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
 #          mv *.tgz my-chart-${{ env.CHART_VERSION }}.tgz
 #          ls -l # Monitor *.tgz name and version
-
-      - name: Validate KUBE_CONFIG format (debug only)
-        run: |
-          echo "==== Cluster Names ===="
-          yq e '.clusters[].name' <<< "$KUBECONFIG"
-
-          echo "==== Context Names ===="
-          yq e '.contexts[].name' <<< "$KUBECONFIG"
-
-          echo "==== Current Context ===="
-          yq e '.current-context' <<< "$KUBECONFIG"
-        env:
-          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
 
       - name: Set up Kubernetes context
         uses: azure/k8s-set-context@v3
