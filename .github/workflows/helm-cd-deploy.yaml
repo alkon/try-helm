@@ -59,7 +59,7 @@ jobs:
 #          ls -l ./k8s/
 
       - name: Deploy Helm chart to Kubernetes
-          uses: azure/k8s-deploy@v4
+        uses: azure/k8s-deploy@v4
           with:
             action: deploy
             helmChartPath: "./my-chart-${{ env.CHART_VERSION }}.tgz"
