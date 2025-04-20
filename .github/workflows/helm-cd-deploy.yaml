@@ -42,17 +42,15 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry-1.docker.io -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin    
 
-      - name: Extract chart version from Chart.yaml # Store it as GITHUB_ENV, and reference with ${{ env.CHART_VERSION }}
+      - name: Extract chart version from Chart.yaml # Store it as GITHUB_ENV to reference later with ${{ env.CHART_VERSION }}
         run: |
-          echo "CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')" >> $GITHUB_ENV
+          echo "CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '\"')" >> $GITHUB_ENV
 
       - name: Pull Helm Chart from OCI using ORAS
         run: |
-#          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
-#          echo "Chart Version: $CHART_VERSION"
           echo "Chart Version: ${{ env.CHART_VERSION }}"
           oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
-          ls -l # You should see the my-chart-v0.1.1.tgz file (or similar)
+          ls -l # Monitor *.tgz name and version
 
 #      - name: Pull Helm Chart from OCI
 #        run: |
