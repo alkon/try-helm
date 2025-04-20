@@ -35,7 +35,7 @@ jobs:
         run: |
             CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
             echo "Chart Version: $CHART_VERSION" #added for debug
-            helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${CHART_VERSION}  --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
+            helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v${CHART_VERSION}  --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
             ls -l
 
       - name: Install/Upgrade Helm Release

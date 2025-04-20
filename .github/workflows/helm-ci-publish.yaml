@@ -47,4 +47,4 @@ jobs:
           # set the tag
           CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') # Corrected path
           echo "CHART VERSION: $CHART_VERSION"
-          helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }} # Corrected path
+          helm push ./my-chart-v$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }} # Corrected path
