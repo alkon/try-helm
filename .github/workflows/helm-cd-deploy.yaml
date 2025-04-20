@@ -33,9 +33,10 @@ jobs:
 
       - name: Download ORAS CLI
         run: |
-          curl -LO https://github.com/oras-project/oras/releases/latest/download/oras_$(uname -s)_amd64.tar.gz
-          tar -zxvf oras_$(uname -s)_amd64.tar.gz
-          sudo mv oras /usr/local/bin/    
+          ORAS_VERSION=1.2.2
+          curl -LO https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_$(uname -s)_amd64.tar.gz
+          tar -zxvf oras_${ORAS_VERSION}_$(uname -s)_amd64.tar.gz
+          sudo mv oras /usr/local/bin/
 
       - name: Pull Helm Chart from OCI using ORAS
         run: |
