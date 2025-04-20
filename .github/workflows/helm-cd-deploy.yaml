@@ -19,7 +19,7 @@ jobs:
         uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }} # Add KUBECONFIG as secret in Github
+          kubeconfig: ${{ secrets.KUBE_CONFIG }} # Add KUBECONFIG as secret in Github
 
       - name: Install Helm
         uses: azure/setup-helm@v4
