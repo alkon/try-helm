@@ -1,4 +1,4 @@
-name: Publish Helm Chart to OCI
+name: Helm Chart - Publish - CI pipeline
 
 on:
   push:

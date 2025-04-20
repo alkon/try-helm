@@ -1,8 +1,8 @@
-name: Deploy Helm Chart to Kubernetes
+name: Helm Chart - Deploy - CD pipeline
 
 on:
   workflow_run:
-    workflows: ["Publish Helm Chart to OCI"]
+    workflows: ["Helm Chart - Publish - CI pipeline"]
     types:
       - completed
 
