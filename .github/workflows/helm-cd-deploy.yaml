@@ -15,12 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }} # Add KUBECONFIG as secret in Github
-
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
@@ -59,6 +53,12 @@ jobs:
 #          oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
 #          mv *.tgz my-chart-${{ env.CHART_VERSION }}.tgz
 #          ls -l # Monitor *.tgz name and version
+
+      - name: Set up Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }} # Add KUBECONFIG as secret in Github
 
       - name: Template Helm chart
         run: |
