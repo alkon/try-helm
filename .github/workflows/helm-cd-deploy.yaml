@@ -56,8 +56,6 @@ jobs:
         uses: azure/k8s-deploy@v4
         with:
           action: deploy
-          manifests: |
-            [] # Optional if you’re not using manifests
           helmCharts: |
             [
               {
