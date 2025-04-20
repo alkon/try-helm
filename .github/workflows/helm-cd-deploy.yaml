@@ -71,8 +71,10 @@ jobs:
         run: |
           helm template my-release ./my-chart-${{ env.CHART_VERSION }}.tgz \
             --namespace default \
+            --set image.repository=registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart \
             --set image.tag=${{ env.CHART_VERSION }} \
             > rendered.yaml
+    
 
       - name: Deploy rendered manifests
         uses: azure/k8s-deploy@v4
