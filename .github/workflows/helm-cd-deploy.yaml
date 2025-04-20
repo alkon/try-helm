@@ -58,11 +58,17 @@ jobs:
 #          echo "Listing contents of ./k8s/"
 #          ls -l ./k8s/
 
-      - name: Deploy Helm chart to Kubernetes
+      - name: Template Helm chart
+        run: |
+          helm template my-release ./my-chart-${{ env.CHART_VERSION }}.tgz \
+            --namespace default \
+            --set image.tag=${{ env.CHART_VERSION }} \
+            > rendered.yaml
+
+      - name: Deploy rendered manifests
         uses: azure/k8s-deploy@v4
         with:
           action: deploy
-          helmChartPath: "./my-chart-${{ env.CHART_VERSION }}.tgz"
-          releaseName: "my-release"
-          namespace: "default"
-          overrideValues: "image.tag=${{ env.CHART_VERSION }}"
+          manifests: |
+            rendered.yaml
+          namespace: default
