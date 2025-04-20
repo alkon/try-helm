@@ -38,6 +38,10 @@ jobs:
           tar -zxvf oras_${ORAS_VERSION}_$(uname -s)_amd64.tar.gz
           sudo mv oras /usr/local/bin/
 
+      - name: ORAS Registry Login
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry-1.docker.io -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin    
+
       - name: Pull Helm Chart from OCI using ORAS
         run: |
           CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
