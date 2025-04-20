@@ -26,7 +26,7 @@ jobs:
         with:
           version: v3.14.0
 
-      - name: Helm Registry Login
+      - name: Helm Registry Login§§§§§
         run: |
           echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
           helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
@@ -36,6 +36,51 @@ jobs:
             CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
             helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v$CHART_VERSION  --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
             ls -l
+name: Deploy Helm Chart to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Publish Helm Chart to OCI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }} # Add KUBECONFIG as secret in Github
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Helm Registry Login§§§§§
+        run: |
+          echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
+          helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
+
+      - name: Pull Helm Chart from OCI
+        run: |
+            CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
+            echo "Chart Version: $CHART_VERSION" #added for debug
+            helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:v$CHART_VERSION  --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
+            ls -l
+
+      - name: Install/Upgrade Helm Release
+        run: |
+          helm upgrade --install my-release ./my-chart-$CHART_VERSION.tgz \
+            --namespace default --create-namespace \
+            --set image.tag=$CHART_VERSION
 
       - name: Install/Upgrade Helm Release
         run: |
