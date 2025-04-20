@@ -42,7 +42,7 @@ jobs:
         run: |
           CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"')
           echo "Chart Version: $CHART_VERSION"
-          oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:$CHART_VERSION --auth-username ${{ secrets.DOCKERHUB_USERNAME }} --auth-password ${{ secrets.DOCKERHUB_PASSWORD }}
+          oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:$CHART_VERSION
           ls -l # You should see the my-chart-v0.1.1.tgz file (or similar)
 #      - name: Pull Helm Chart from OCI
 #        run: |
