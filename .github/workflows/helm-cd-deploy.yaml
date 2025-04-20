@@ -52,14 +52,14 @@ jobs:
           oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
           ls -l # Monitor *.tgz name and version
 
-      - name: List manifest directory contents
-        run: |
-          echo "Current working directory: $(pwd)"
-          echo "Listing contents of ./k8s/"
-          ls -l ./k8s/
+#      - name: List manifest directory contents
+#        run: |
+#          echo "Current working directory: $(pwd)"
+#          echo "Listing contents of ./k8s/"
+#          ls -l ./k8s/
 
       - name: Deploy to Kubernetes using Helm
-        uses: azure/k8s-deploy@v4
+        uses: azure/k8s-deploy@v3
         with:
           action: deploy
           manifests: '["./k8s/dummy-manifest.yaml"]'
