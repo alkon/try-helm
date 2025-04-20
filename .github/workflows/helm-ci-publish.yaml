@@ -43,10 +43,8 @@ jobs:
 
       - name: Push Helm Chart to OCI
         run: |
-          # cd charts/my-chart # Removed
-          # set the tag
-          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') # Corrected path
+          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') 
           echo "CHART VERSION: $CHART_VERSION"
-          helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }} # Corrected path
+          helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }} 
           
 
