@@ -8,22 +8,23 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Helm
+      - name: Set up Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }} # Add KUBECONFIG as secret in Github
+
+      - name: Install Helm
         uses: azure/setup-helm@v4
         with:
           version: v3.14.0
-
-      - name: Set up Kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
 
       - name: Helm Registry Login
         run: |
