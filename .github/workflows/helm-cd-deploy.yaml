@@ -50,6 +50,7 @@ jobs:
         run: |
           echo "Chart Version: ${{ env.CHART_VERSION }}"
           oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
+          mv *.tgz my-chart-${{ env.CHART_VERSION }}.tgz
           ls -l # Monitor *.tgz name and version
 
 #      - name: List manifest directory contents
