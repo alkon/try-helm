@@ -1,0 +1,100 @@
+---
+# Source: my-chart/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-release-my-chart
+  labels:
+    helm.sh/chart: my-chart-v0.1.1
+    app.kubernetes.io/name: my-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: my-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-release-my-chart
+  labels:
+    helm.sh/chart: my-chart-v0.1.1
+    app.kubernetes.io/name: my-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: my-chart
+    app.kubernetes.io/instance: my-release
+---
+# Source: my-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-release-my-chart
+  labels:
+    helm.sh/chart: my-chart-v0.1.1
+    app.kubernetes.io/name: my-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-chart
+      app.kubernetes.io/instance: my-release
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: my-chart-v0.1.1
+        app.kubernetes.io/name: my-chart
+        app.kubernetes.io/instance: my-release
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: my-release-my-chart
+      containers:
+        - name: my-chart
+          image: "registry-1.docker.io/alkon100/my-chart:0.1.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+# Source: my-chart/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "my-release-my-chart-test-connection"
+  labels:
+    helm.sh/chart: my-chart-v0.1.1
+    app.kubernetes.io/name: my-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['my-release-my-chart:80']
+  restartPolicy: Never
