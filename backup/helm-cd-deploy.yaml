@@ -1,0 +1,95 @@
+name: Helm Chart - Deploy - CD pipeline
+
+on:
+  workflow_run:
+    workflows: ["Helm Chart - Publish - CI pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    env:
+      CHART_VERSION: "0.1.1"  # Set it here for the entire job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Helm Registry Login
+        run: |
+          echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
+          helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
+
+#      - name: Extract chart version from Chart.yaml # Store it as GITHUB_ENV to reference later with ${{ env.CHART_VERSION }}
+#        run: |
+#          echo "CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '\"')" >> $GITHUB_ENV
+
+      - name: Pull Helm Chart from OCI using Helm
+        run: |
+          helm registry login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart --version ${{ env.CHART_VERSION }}
+          ls -l
+
+#      - name: Download ORAS CLI
+#        run: |
+#          ORAS_VERSION=1.2.2
+#          curl -LO https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_$(uname -s)_amd64.tar.gz
+#          tar -zxvf oras_${ORAS_VERSION}_$(uname -s)_amd64.tar.gz
+#          sudo mv oras /usr/local/bin/
+
+
+#      - name: ORAS Registry Login
+#        run: |
+#          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry-1.docker.io -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+#      - name: Pull Helm Chart from OCI using ORAS
+#        run: |
+#          echo "Chart Version: ${{ env.CHART_VERSION }}"
+#          oras pull registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart:${{ env.CHART_VERSION }}
+#          mv *.tgz my-chart-${{ env.CHART_VERSION }}.tgz
+#          ls -l # Monitor *.tgz name and version
+
+      - name: Set up Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }} # Add KUBECONFIG as secret in Github
+
+      - name: Show current Kubernetes context
+        run: |
+          kubectl config current-context
+          kubectl get nodes    
+
+      - name: Template Helm chart
+        run: |
+          helm template my-release ./my-chart-${{ env.CHART_VERSION }}.tgz \
+            --namespace default \
+            --set image.repository=registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-chart \
+            --set image.tag=${{ env.CHART_VERSION }} \
+            > rendered.yaml
+    
+
+      - name: Deploy rendered manifests
+        uses: azure/k8s-deploy@v4
+        with:
+          action: deploy
+          manifests: |
+            rendered.yaml
+          namespace: default
+          pull-images: true
+          strategy: basic
+          route-method: service
+          version-switch-buffer: 0
+          traffic-split-method: pod
+          percentage: 0
+          force: false
+          annotate-namespace: true
+          private-cluster: false
+          skip-tls-verify: false

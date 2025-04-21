@@ -5,7 +5,7 @@ on:
     branches:
       - main # Main branch name
     paths:
-      - "*-chart/**" # Trigger only on changes in each dir that ends with -chart
+      - "my-chart/**" # Trigger only on changes in the my-chart dir
 
 jobs:
   publish:
@@ -22,15 +22,9 @@ jobs:
         with:
           version: v3.14.0 # Pin the appropriate stable version
 
-      - name: Get Chart Name
-        id: get-chart-name
-        run: |
-          CHART_DIR=$(ls -d */ | grep -vE '^\.' | head -n 1) # Get the first directory
-          echo "CHART_DIR=$CHART_DIR" >> "$GITHUB_OUTPUT"
-
       - name: Lint Helm Chart
         run: |
-          helm lint ${{ steps.get-chart-name.outputs.CHART_DIR }}
+          helm lint my-chart/    
 
       - name: Set up Docker config
         run: |
@@ -45,14 +39,12 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          helm package ${{ steps.get-chart-name.outputs.CHART_DIR }}
+          helm package my-chart/ # Corrected path
 
       - name: Push Helm Chart to OCI
         run: |
-          CHART_NAME=$(yq e '.name' ${{ steps.get-chart-name.outputs.CHART_DIR }}/Chart.yaml | tr -d '"')
-          CHART_VERSION=$(yq e '.version' ${{ steps.get-chart-name.outputs.CHART_DIR }}/Chart.yaml | tr -d '"')
-          echo "CHART NAME: $CHART_NAME"
+          CHART_VERSION=$(yq e '.version' my-chart/Chart.yaml | tr -d '"') 
           echo "CHART VERSION: $CHART_VERSION"
-          echo "CHART_NAME=$CHART_NAME" > chart_info.txt
-          echo "CHART_VERSION=$CHART_VERSION" >> chart_info.txt
-          helm push ./${CHART_NAME}-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
+          helm push ./my-chart-$CHART_VERSION.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }} 
+          
+
