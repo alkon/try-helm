@@ -30,7 +30,7 @@ jobs:
 
       - name: Lint Helm Chart
         run: |
-          helm lint ${{ steps.get-chart-name.outputs.CHART_DIR }}
+          helm lint ${{ steps.get-chart-name.outputs.CHART_DIR }} --ignore-path backup
 
       - name: Set up Docker config
         run: |
