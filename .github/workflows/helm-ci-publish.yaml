@@ -5,7 +5,7 @@ on:
     branches:
       - main # Main branch name
     paths:
-      - "*-chart/**" # Trigger only on changes in each dir that ends with -chart
+      - "my-chart/**" # Trigger only on changes in each dir that ends with -chart
 
 jobs:
   publish:
