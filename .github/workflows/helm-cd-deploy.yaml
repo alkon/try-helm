@@ -1,10 +1,10 @@
 name: Helm Chart - Deploy - CD pipeline
 
-#on:
-#  workflow_run:
-#    workflows: ["Helm Chart - Publish - CI pipeline"]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: ["Helm Chart - Publish - CI pipeline"]
+    types:
+      - completed
 
 jobs:
   deploy:
