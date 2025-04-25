@@ -19,3 +19,4 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.service.port }}
+          command: ["/bin/sleep", "3600"] # sleep to prevent immediate exit
