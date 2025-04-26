@@ -42,7 +42,7 @@ jobs:
       - name: Download Chart Info Artifact
         uses: actions/download-artifact@v4
         with:
-            name: chart-info
+          name: chart-info
 
       - name: Debug Chart Info File Content # Optional debugging
           run: cat $GITHUB_WORKSPACE/chart_info.txt
