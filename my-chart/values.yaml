@@ -2,7 +2,7 @@ image:
   repository: busybox
   tag: latest
 
-replicaCount: 3
+replicaCount: 2
 
 service:
   enabled: true

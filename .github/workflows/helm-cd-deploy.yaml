@@ -45,7 +45,7 @@ jobs:
           name: chart-info
 
       - name: Debug Chart Info File Content # Optional debugging
-          run: cat $GITHUB_WORKSPACE/chart_info.txt
+        run: cat $GITHUB_WORKSPACE/chart_info.txt
 
 #      - name: Debug Chart Info Output
 #        run: |
