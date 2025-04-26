@@ -33,6 +33,14 @@ jobs:
           echo "CHART_NAME=$CHART_NAME" >> "$GITHUB_OUTPUT"
           echo "CHART_VERSION=$CHART_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Debug Chart Info Output
+        run: |
+          echo "Chart Name: ${{ steps.get-chart-info.outputs.CHART_NAME }}"
+          echo "Chart Version: ${{ steps.get-chart-info.outputs.CHART_VERSION }}"
+
+      - name: Debug Chart Info File Content
+        run: cat $GITHUB_WORKSPACE/chart_info.txt
+
       - name: Pull Helm Chart from OCI using Helm
         run: |
           helm registry login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
