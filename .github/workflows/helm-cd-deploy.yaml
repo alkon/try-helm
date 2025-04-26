@@ -25,40 +25,32 @@ jobs:
           echo '${{ secrets.DOCKER_CONFIG }}' | base64 -d > ~/.docker/config.json
           helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
 
-      - name: Get Chart Name and Version from CI Workflow
-        id: get-chart-info
-        run: |
-          CHART_NAME=$(cat $GITHUB_WORKSPACE/chart_info.txt | grep CHART_NAME | cut -d'=' -f2)
-          CHART_VERSION=$(cat $GITHUB_WORKSPACE/chart_info.txt | grep CHART_VERSION | cut -d'=' -f2)
-          echo "CHART_NAME=$CHART_NAME" >> "$GITHUB_OUTPUT"
-          echo "CHART_VERSION=$CHART_VERSION" >> "$GITHUB_OUTPUT"
+      # Commenting out artifact download and chart info retrieval
+      # - name: Download Chart Info Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: chart-info
 
-      - name: Save Chart Info as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: chart-info
-          path: chart_info.txt
+      # - name: Debug Chart Info File Content # Optional debugging
+      #   run: cat $GITHUB_WORKSPACE/chart_info.txt
 
-      - name: Download Chart Info Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: chart-info
+      # - name: Get Chart Name and Version from CI Workflow
+      #   id: get-chart-info
+      #   run: |
+      #     CHART_NAME=$(cat $GITHUB_WORKSPACE/chart_info.txt | grep CHART_NAME | cut -d'=' -f2)
+      #     CHART_VERSION=$(cat $GITHUB_WORKSPACE/chart_info.txt | grep CHART_VERSION | cut -d'=' -f2)
+      #     echo "CHART_NAME=$CHART_NAME" >> "$GITHUB_OUTPUT"
+      #     echo "CHART_VERSION=$CHART_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Debug Chart Info File Content # Optional debugging
-        run: cat $GITHUB_WORKSPACE/chart_info.txt
-
-#      - name: Debug Chart Info Output
-#        run: |
-#          echo "Chart Name: ${{ steps.get-chart-info.outputs.CHART_NAME }}"
-#          echo "Chart Version: ${{ steps.get-chart-info.outputs.CHART_VERSION }}"
-
-      - name: Debug Chart Info File Content
-        run: cat $GITHUB_WORKSPACE/chart_info.txt
+      # - name: Debug Chart Info Output # Optional debugging
+      #   run: |
+      #     echo "Chart Name: ${{ steps.get-chart-info.outputs.CHART_NAME }}"
+      #     echo "Chart Version: ${{ steps.get-chart-info.outputs.CHART_VERSION }}"
 
       - name: Pull Helm Chart from OCI using Helm
         run: |
-          helm registry login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-          helm pull oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.get-chart-info.outputs.CHART_NAME }} --version ${{ steps.get-chart-info.outputs.CHART_VERSION }}
+          helm registry login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} registry-1.docker.io
+          helm pull oci://registry-1.docker.io/alkon100/busybox-test-chart --version v1.0.1
           ls -l
 
       - name: Set up Kubernetes context
@@ -74,10 +66,10 @@ jobs:
 
       - name: Template Helm chart
         run: |
-          helm template my-release ./${{ steps.get-chart-info.outputs.CHART_NAME }}-${{ steps.get-chart-info.outputs.CHART_VERSION }}.tgz \
+          helm template my-release ./busybox-test-chart-v1.0.1.tgz \
             --namespace default \
-            --set image.repository=registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.get-chart-info.outputs.CHART_NAME }} \
-            --set image.tag=${{ steps.get-chart-info.outputs.CHART_VERSION }} \
+            --set image.repository=registry-1.docker.io/alkon100/busybox-test-chart \
+            --set image.tag=v1.0.1 \
             > rendered.yaml
 
       - name: Deploy rendered manifests
