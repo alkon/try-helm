@@ -33,10 +33,24 @@ jobs:
           echo "CHART_NAME=$CHART_NAME" >> "$GITHUB_OUTPUT"
           echo "CHART_VERSION=$CHART_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Debug Chart Info Output
-        run: |
-          echo "Chart Name: ${{ steps.get-chart-info.outputs.CHART_NAME }}"
-          echo "Chart Version: ${{ steps.get-chart-info.outputs.CHART_VERSION }}"
+      - name: Save Chart Info as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chart-info
+          path: chart_info.txt
+
+      - name: Download Chart Info Artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: chart-info
+
+      - name: Debug Chart Info File Content # Optional debugging
+          run: cat $GITHUB_WORKSPACE/chart_info.txt
+
+#      - name: Debug Chart Info Output
+#        run: |
+#          echo "Chart Name: ${{ steps.get-chart-info.outputs.CHART_NAME }}"
+#          echo "Chart Version: ${{ steps.get-chart-info.outputs.CHART_VERSION }}"
 
       - name: Debug Chart Info File Content
         run: cat $GITHUB_WORKSPACE/chart_info.txt
